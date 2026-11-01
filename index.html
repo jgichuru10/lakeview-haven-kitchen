@@ -104,6 +104,9 @@ h1{font-family:var(--display);font-size:28px;line-height:1.15;margin:6px 0 4px;t
 .card .rm{background:none;border:none;color:var(--muted);text-decoration:underline;font:500 13px var(--body);cursor:pointer;padding:6px 0 0}
 .total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 4px;border-top:2px solid var(--line);margin-top:6px}
 .total b{font-family:var(--display);font-size:24px;color:var(--ink);font-variant-numeric:tabular-nums}
+.pp{background:var(--lake-soft);border-radius:12px;padding:10px 12px;margin:2px 0 6px;font-size:14px;color:var(--ink)}
+.pp b{font-family:var(--display);font-size:18px;color:var(--lake);font-variant-numeric:tabular-nums}
+.pp small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .field{display:grid;gap:6px;margin-top:14px}
 .field label{font-weight:600}
 .field input{font:16px var(--body);padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
@@ -516,6 +519,22 @@ function mealScreen(){
   refresh();
 }
 
+// ---------- per-person reference under the total ----------
+// Average cost for one adult per meal: total / (adult-equivalents x meals ordered).
+// Children 4 to 10 count as half an adult, under 4 as zero, matching how prices are charged.
+function perPersonHTML(){
+  const meals = S.meals.filter(x => !x.skip && done(x)).length;
+  const t = total(), p = pe();
+  if(!meals || !t || !p) return "";
+  const perMeal = t / p / meals;
+  const nights = Math.max(1, Math.round((S.stay.out - S.stay.in)/86400e3));
+  const perDay = t / p / nights;
+  const kidsNote = S.people.kids || S.people.tots
+    ? `Children 4 to 10 pay half of this${S.people.tots ? ", and under 4 eat free" : ""}.` : "";
+  return `<div class="pp">That's about <b>${ksh(Math.round(perMeal/10)*10)}</b> per adult, per meal
+    <small>${meals} meal${meals>1?"s":""} for ${esc(whoText())}, about ${ksh(Math.round(perDay/10)*10)} per adult a day. ${kidsNote}</small></div>`;
+}
+
 // ---------- review ----------
 function messageBody(){
   const p = [];
@@ -559,6 +578,7 @@ function review(){
     ${S.plan === "meal" ? `<div class="stack"><button type="button" class="btn ghost" id="addRemove">Add or remove meals</button></div>` : ""}
     ${S.people.veg ? `<p class="note">A vegetarian plate is included at each meal for the guest who doesn't eat meat.</p>` : ""}
     <div class="total"><span>Estimated total</span><b>${ksh(total())}</b></div>
+    ${perPersonHTML()}
     <p class="note">Your order is confirmed once paid, through Airbnb or by M-Pesa to Zipporah (+254 795 808391). Changes are free until the ordering deadline: 24 hours before each meal, or 3 days for Signature Nights. After that, the meal is charged because Zipporah will have shopped for it.</p>
     <div class="sub">How will you pay?</div>
     <div class="chips" id="payChips">${chip("data-pay","airbnb","Through Airbnb", S.pay==="airbnb")}${chip("data-pay","mpesa","M-Pesa to Zipporah", S.pay==="mpesa")}</div>
