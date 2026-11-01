@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Plan your home-cooked Kenyan meals at Lakeview Haven, Naivasha, meal by meal for your stay, then send your order in your Airbnb chat.">
+<meta name="theme-color" content="#1F4E4A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%231F4E4A%27/%3E%3Ctext x=%2732%27 y=%2743%27 font-size=%2730%27 text-anchor=%27middle%27 fill=%27%23F3C9B4%27 font-family=%27Georgia%27 font-weight=%27700%27%3ELH%3C/text%3E%3C/svg%3E">
+<title>Lakeview Haven Kitchen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+/* Layout: one-column ordering kiosk, big tap tiles, sticky order bar at the bottom */
+:root{
+  --bg:#FBF7EF; --surface:#FFFFFF; --ink:#24302E; --muted:#6B706B; --line:#E4DCCD;
+  --lake:#1F4E4A; --lake-ink:#FFFFFF; --lake-soft:#E3ECE8;
+  --clay:#B5532E; --clay-soft:#F6E5DB; --leaf:#4E7D3A; --warn:#9A5B12; --warn-soft:#FBEFD9;
+  --display:'Lora', Georgia, 'Times New Roman', serif;
+  --body:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121A19; --surface:#1A2524; --ink:#ECEAE3; --muted:#A3AAA4; --line:#2E3B39;
+  --lake:#2F7A72; --lake-ink:#FFFFFF; --lake-soft:#1F3533;
+  --clay:#E08A63; --clay-soft:#3A2820; --leaf:#7FB069; --warn:#E3B062; --warn-soft:#3A2E1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121A19; --surface:#1A2524; --ink:#ECEAE3; --muted:#A3AAA4; --line:#2E3B39;
+  --lake:#2F7A72; --lake-ink:#FFFFFF; --lake-soft:#1F3533;
+  --clay:#E08A63; --clay-soft:#3A2820; --leaf:#7FB069; --warn:#E3B062; --warn-soft:#3A2E1A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 120px}
+.wrap{max-width:640px;margin:0 auto}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 10px}
+.brand{font-family:var(--display);font-weight:700;color:var(--lake);font-size:20px;line-height:1.1}
+.brand small{display:block;font-family:var(--body);font-weight:500;color:var(--clay);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.back{background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:8px 14px;font:500 14px var(--body);cursor:pointer}
+.back:focus-visible,.tile:focus-visible,.chip:focus-visible,.btn:focus-visible,.step button:focus-visible{outline:3px solid var(--clay);outline-offset:2px}
+
+.progress{display:flex;gap:6px;margin:4px 0 14px}
+.progress span{height:4px;flex:1;border-radius:4px;background:var(--line)}
+.progress span.on{background:var(--clay)}
+
+h1{font-family:var(--display);font-size:28px;line-height:1.15;margin:6px 0 4px;text-wrap:balance;color:var(--ink)}
+.lede{color:var(--muted);margin:0 0 16px}
+.rule{background:var(--clay-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:16px}
+.rule b{color:var(--clay)}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid.one{grid-template-columns:1fr}
+@media (max-width:360px){.grid{grid-template-columns:1fr}}
+.tile{appearance:none;text-align:left;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:var(--r);
+  padding:14px;min-height:84px;cursor:pointer;display:flex;flex-direction:column;gap:4px;font-family:var(--body);transition:border-color .12s, transform .08s}
+.tile:hover{border-color:var(--lake)}
+.tile:active{transform:scale(.98)}
+.tile .name{font-weight:700;font-size:17px;line-height:1.2}
+.tile .desc{color:var(--muted);font-size:13px;line-height:1.3}
+.tile .price{margin-top:auto;font-family:var(--display);font-weight:700;color:var(--clay);font-size:16px}
+.tile.sel{border-color:var(--lake);background:var(--lake-soft)}
+.tile.big{min-height:104px}
+.v{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--leaf);color:#fff;font-size:10px;font-weight:700;margin-left:6px;vertical-align:2px}
+.sub{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.sub.veg{color:var(--leaf)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 12px;font:600 14px var(--body);cursor:pointer;min-width:84px;text-align:center}
+#days{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}
+#days .chip{min-width:0}
+.chip small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.chip.sel{border-color:var(--lake);background:var(--lake);color:var(--lake-ink)}
+.chip.sel small{color:var(--lake-ink);opacity:.85}
+.chip:disabled{opacity:.4;cursor:not-allowed}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+.note a{color:var(--lake);font-weight:600}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+.counter{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-bottom:10px}
+.counter .lbl{font-weight:600}
+.counter .lbl small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:44px;height:44px;border-radius:50%;border:2px solid var(--lake);background:var(--surface);color:var(--lake);font:700 22px var(--body);cursor:pointer;line-height:1}
+.step button:disabled{opacity:.35;cursor:not-allowed}
+.step output{min-width:28px;text-align:center;font:700 20px var(--body);font-variant-numeric:tabular-nums}
+
+.toggle{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;cursor:pointer;font-weight:600}
+.toggle input{width:22px;height:22px;accent-color:var(--lake)}
+
+.btn{appearance:none;border:none;border-radius:999px;padding:16px 20px;font:700 17px var(--body);cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.primary{background:var(--clay);color:#fff}
+.btn.lake{background:var(--lake);color:var(--lake-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stack{display:grid;gap:10px;margin-top:18px}
+
+.sumline{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card .meta{color:var(--muted);font-size:14px}
+.card .amt{font-family:var(--display);font-weight:700;color:var(--clay);white-space:nowrap;font-variant-numeric:tabular-nums}
+.card .rm{background:none;border:none;color:var(--muted);text-decoration:underline;font:500 13px var(--body);cursor:pointer;padding:6px 0 0}
+.total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 4px;border-top:2px solid var(--line);margin-top:6px}
+.total b{font-family:var(--display);font-size:24px;color:var(--ink);font-variant-numeric:tabular-nums}
+.field{display:grid;gap:6px;margin-top:14px}
+.field label{font-weight:600}
+.field input{font:16px var(--body);padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.field input:focus{outline:none;border-color:var(--lake)}
+.staybar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--lake-soft);color:var(--ink);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:14px}
+.staybar b{font-weight:700}
+.staybar button{background:none;border:none;color:var(--lake);font:600 14px var(--body);text-decoration:underline;cursor:pointer;padding:4px 0}
+.chip .tag{display:block;font-size:11px;font-weight:600;color:var(--clay);text-transform:uppercase;letter-spacing:.04em}
+.chip.sel .tag{color:var(--lake-ink)}
+.ptext{font-size:13px;font-weight:600;color:var(--muted);margin:2px 0 6px}
+.ptrack{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:14px}
+.ptrack span{display:block;height:100%;background:var(--clay);border-radius:6px;transition:width .2s}
+.mealhead{display:grid;gap:2px;margin-bottom:14px}
+.mealhead .when{font-size:14px;font-weight:600;color:var(--clay)}
+.mealhead h1{margin:0}
+.mealhead .cost{font-size:14px;color:var(--muted)}
+.chip .v{width:16px;height:16px;font-size:9px;margin-left:5px}
+.mealrow h3{font-size:15px}
+.warnbox a{color:inherit;font-weight:700}
+.empty{text-align:center;color:var(--muted);padding:28px 8px}
+pre.preview{white-space:pre-wrap;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:12px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;color:var(--ink);margin:0;overflow-x:auto}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:12px 0 8px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--lake);color:var(--lake-ink);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.bar .in{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar .t{font-size:14px;opacity:.9}
+.bar .t b{display:block;font-size:18px;opacity:1;font-variant-numeric:tabular-nums}
+.bar button{background:var(--clay);color:#fff;border:none;border-radius:999px;padding:12px 18px;font:700 15px var(--body);cursor:pointer}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Lakeview Haven Kitchen<small>Order your meals</small></div>
+    <button class="back" id="backBtn" type="button" hidden>&larr; Back</button>
+  </header>
+  <div id="progress" aria-hidden="true"></div>
+  <main id="app" aria-live="polite"></main>
+</div>
+<div class="bar" id="bar" hidden>
+  <div class="in">
+    <div class="t" id="barText">Running total</div>
+    <button type="button" id="barBtn">Review my order</button>
+  </div>
+</div>
+
+<script>
+(function(){
+const WA_NUMBER = "254795808391";
+const KE_OFFSET_H = 3; // Kenya is UTC+3, no daylight saving
+
+// ---------- menu data ----------
+const PRICE = {B:600, L:900, D:900};
+const PKG_MEAL = {B:600, L:750, D:750}; // package rate per meal: Half Board day = 600 + 750, Full Board day adds a 750 lunch
+const SERVE = {B:[8,0], L:[13,0], D:[19,30]};
+const BREAKFAST = [
+  {id:"pancakes", name:"Pancakes, eggs & sausage"},
+  {id:"bread", name:"Bread, eggs & avocado", v:true},
+  {id:"sweetpot", name:"Sweet potatoes, eggs & greens", v:true},
+  {id:"mahamri", name:"Mahamri, beans & eggs", desc:"Coconut doughnuts", v:true},
+  {id:"nduma", name:"Nduma, eggs & sausage", desc:"Taro"},
+  {id:"uji", name:"Uji, eggs & fruit", desc:"Millet porridge", v:true}
+];
+const BASES = [
+  {id:"ugali", name:"Ugali", desc:"Maize meal"}, {id:"white", name:"White rice"}, {id:"coconut", name:"Coconut rice"},
+  {id:"pilau", name:"Pilau", desc:"Spiced rice"}, {id:"chapati", name:"Chapati", desc:"Flatbread"},
+  {id:"mukimo", name:"Mukimo", desc:"Potato & greens mash"}, {id:"matoke", name:"Matoke", desc:"Green bananas"},
+  {id:"chips", name:"Chips", desc:"French fries"}
+];
+const MEAT = [{id:"beef", name:"Beef stew"}, {id:"chicken", name:"Chicken stew"}, {id:"goat", name:"Goat / mutton"},
+  {id:"fishstew", name:"Fish stew (tilapia)"}, {id:"liver", name:"Liver"}];
+const VEG = [{id:"beans", name:"Coconut beans", v:true}, {id:"ndengu", name:"Green grams", v:true},
+  {id:"lentils", name:"Lentils", v:true}, {id:"njahi", name:"Black beans", v:true}];
+const SIGNATURE = [
+  {id:"choma", name:"Nyama Choma Night", desc:"Soup to start, roast goat with kachumbari & greens, 2 sides of your choice, then chai or fresh juice", price:1800, up:900, min:11000, sides:["ugali","chips","mukimo","chapati"]},
+  {id:"fish", name:"Lake Naivasha Fish Feast", desc:"Soup to start, a whole fried tilapia each with kachumbari, 2 sides of your choice, then chai or fresh juice", price:1500, up:600, sides:["ugali","coconut","chips","chapati"]}
+];
+const PLANS = {
+  meal: {name:"Pay per meal", desc:"Choose meal by meal and skip any you don't need."},
+  HB: {name:"Half Board", desc:"Breakfast and dinner every day of your stay."},
+  FB: {name:"Full Board", desc:"Breakfast, lunch and dinner every day of your stay."}
+};
+const find = (list, id) => list.find(x => x.id === id);
+
+// ---------- state ----------
+const app = document.getElementById("app");
+const backBtn = document.getElementById("backBtn");
+const progress = document.getElementById("progress");
+const bar = document.getElementById("bar");
+const barText = document.getElementById("barText");
+const barBtn = document.getElementById("barBtn");
+
+function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function save(){ try{ localStorage.setItem("lh_state", JSON.stringify(S)); }catch(e){} }
+let S = load("lh_state", null) || {stay:null, people:{adults:2, kids:0, tots:0, veg:false}, plan:null, meals:[], name:""};
+S.notes = S.notes || "";
+let screen = "stay", step = 0, history = [];
+
+const ksh = n => "KSh " + Math.round(n).toLocaleString("en-US");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---------- dates (Kenya time) ----------
+function keToday(){ const k = new Date(Date.now() + KE_OFFSET_H*3600e3); return Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate()); }
+function parseISO(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||""); return m ? Date.UTC(+m[1], +m[2]-1, +m[3]) : null; }
+function isoOf(ms){ return new Date(ms).toISOString().slice(0,10); }
+function serveMs(day, meal){ const t = SERVE[meal]; return day + (t[0]-KE_OFFSET_H)*3600e3 + t[1]*60e3; }
+function longDate(ms){ return new Date(ms).toLocaleDateString("en-GB",{weekday:"short", day:"numeric", month:"short", timeZone:"UTC"}); }
+function stayText(){ return `${longDate(S.stay.in)} to ${longDate(S.stay.out)}`; }
+function stayValid(){ return !!(S.stay && S.stay.out > S.stay.in && S.stay.out >= keToday()); }
+try{ const q = new URLSearchParams(location.search); const a = parseISO(q.get("in")), b = parseISO(q.get("out"));
+  if(a && b && b > a && (!S.stay || S.stay.in !== a || S.stay.out !== b)){ S.stay = {in:a, out:b}; S.plan = null; S.meals = []; save(); } }catch(e){}
+
+// ---------- the meal sequence for the stay ----------
+// Arrival day: dinner only. Middle days: breakfast, lunch, dinner. Departure day: breakfast only.
+// Half Board skips lunch. Meals whose serving time has passed are left out.
+function sequence(plan){
+  const out = [];
+  for(let d = S.stay.in; d <= S.stay.out; d += 86400e3){
+    const first = d === S.stay.in, last = d === S.stay.out;
+    const meals = first ? ["D"] : last ? ["B"] : (plan === "HB" ? ["B","D"] : ["B","L","D"]);
+    meals.forEach(m => { if(serveMs(d, m) > Date.now()) out.push({day:d, meal:m}); });
+  }
+  return out;
+}
+// meals the guest is ordering (pay-per-meal guests pick theirs first; packages include all)
+function active(){ return S.meals.map((x,i) => i).filter(i => !(S.plan === "meal" && S.meals[i].skip)); }
+function keNow(){
+  try{ return new Date().toLocaleString("en-GB", {timeZone:"Africa/Nairobi", weekday:"short", day:"numeric", month:"short", hour:"numeric", minute:"2-digit", hour12:true}) + " Kenya time"; }
+  catch(e){ return new Date(Date.now() + KE_OFFSET_H*3600e3).toUTCString().slice(0,22) + " Kenya time"; }
+}
+function syncMeals(){
+  const old = {}; S.meals.forEach(x => { old[x.day+"-"+x.meal] = x; });
+  S.meals = sequence(S.plan).map(x => old[x.day+"-"+x.meal] || x);
+}
+const pe = () => S.people.adults + 0.5*S.people.kids;
+const heads = () => S.people.adults + S.people.kids + S.people.tots;
+const isPkg = () => S.plan === "HB" || S.plan === "FB";
+function leadHours(x){ return x.sig ? 72 : 24; }
+function shortNotice(x){ return serveMs(x.day, x.meal) - Date.now() < leadHours(x)*3600e3; }
+function done(x){ return x.skip || x.chef || (x.sig ? (x.sides||[]).length === 2 : false) || (x.meal === "B" ? !!x.plate : !!(x.base && x.protein)); }
+
+// ---------- prices ----------
+function sigCost(x){
+  const s = find(SIGNATURE, x.sig);
+  if(!isPkg()) return Math.max(s.price*pe(), s.min || 0);
+  const up = s.up*pe();
+  return s.min ? Math.max(up, s.min - PKG_MEAL.D*pe()) : up; // package dinner + upgrade never below the minimum
+}
+function mealCost(x){
+  if(x.skip) return 0;
+  if(isPkg()) return PKG_MEAL[x.meal]*pe() + (x.sig ? sigCost(x) : 0);
+  if(x.sig) return sigCost(x);
+  return PRICE[x.meal]*pe();
+}
+function planTotal(plan){
+  const keep = S.plan; S.plan = plan;
+  const total = sequence(plan).reduce((a,x) => a + (plan === "meal" ? PRICE[x.meal] : PKG_MEAL[x.meal])*pe(), 0);
+  S.plan = keep; return total;
+}
+// per-meal plans count only meals chosen so far; packages include every meal
+const total = () => S.meals.reduce((a,x) => a + (isPkg() || done(x) ? mealCost(x) : 0), 0);
+
+// ---------- labels ----------
+const MEAL_NAME = {B:"Breakfast", L:"Lunch", D:"Dinner"};
+function mealTitle(x){ return x.meal === "L" && x.packed ? "Packed lunch" : MEAL_NAME[x.meal]; }
+function mealContext(x){
+  if(x.day === S.stay.in) return "Your arrival night";
+  if(x.day === S.stay.out) return "Your departure morning";
+  if(x.meal === "B" && x.day === S.stay.in + 86400e3) return "The morning after you arrive";
+  return "";
+}
+function choiceText(x){
+  if(x.skip) return "Skipped";
+  if(x.sig) return find(SIGNATURE, x.sig).name + (isPkg() ? " (upgrade)" : "") + ((x.sides||[]).length ? " with " + x.sides.map(id => find(BASES,id).name).join(" & ") : "");
+  if(x.chef) return "Chef's choice";
+  if(x.meal === "B") return x.plate ? find(BREAKFAST, x.plate).name : "Not chosen yet";
+  return x.base && x.protein ? `${find(BASES, x.base).name} + ${find([...MEAT,...VEG], x.protein).name}` : "Not chosen yet";
+}
+function whoText(){
+  const p = S.people;
+  return `${p.adults} adult${p.adults===1?"":"s"}${p.kids?`, ${p.kids} child${p.kids===1?"":"ren"} 4 to 10`:""}${p.tots?`, ${p.tots} under 4 (free)`:""}`;
+}
+
+// ---------- navigation ----------
+function go(next, nextStep){ history.push([screen, step]); screen = next; if(nextStep !== undefined) step = nextStep; render(); window.scrollTo({top:0}); }
+backBtn.addEventListener("click", () => { const h = history.pop(); if(h){ [screen, step] = h; } render(); window.scrollTo({top:0}); });
+barBtn.addEventListener("click", () => go("review"));
+
+function tile({id, name, desc, price, v, sel}){
+  return `<button type="button" class="tile${sel?" sel":""}" data-id="${esc(id)}">
+    <span class="name">${esc(name)}${v?'<span class="v" title="Vegetarian">V</span>':""}</span>
+    ${desc?`<span class="desc">${esc(desc)}</span>`:""}${price?`<span class="price">${esc(price)}</span>`:""}</button>`;
+}
+function chip(attr, id, label, sel, v){
+  return `<button type="button" class="chip${sel?" sel":""}" ${attr}="${esc(id)}">${esc(label)}${v?'<span class="v">V</span>':""}</button>`;
+}
+function counterHTML(id, label, sub, val, min){
+  return `<div class="counter"><div class="lbl">${label}${sub?`<small>${sub}</small>`:""}</div>
+    <div class="step"><button type="button" data-c="${id}" data-d="-1" aria-label="Fewer ${label}" ${val<=min?"disabled":""}>&minus;</button>
+    <output id="${id}Out">${val}</output><button type="button" data-c="${id}" data-d="1" aria-label="More ${label}">+</button></div></div>`;
+}
+
+// ---------- screen 1: stay ----------
+function stayScreen(){
+  app.innerHTML = `<h1>When are you staying with us?</h1>
+    <p class="lede">Use the dates on your Airbnb booking. We'll walk you through each meal of your stay.</p>
+    <div class="field"><label for="inDate">Check-in</label><input type="date" id="inDate" value="${S.stay ? isoOf(S.stay.in) : ""}"></div>
+    <div class="field"><label for="outDate">Check-out</label><input type="date" id="outDate" min="${isoOf(keToday())}" value="${S.stay ? isoOf(S.stay.out) : ""}"></div>
+    <div id="warn"></div>
+    <div class="stack"><button type="button" class="btn primary" id="next">Continue</button></div>`;
+  const inEl = document.getElementById("inDate"), outEl = document.getElementById("outDate");
+  inEl.addEventListener("change", () => { const a = parseISO(inEl.value); if(a) outEl.min = isoOf(Math.max(a + 86400e3, keToday())); });
+  document.getElementById("next").addEventListener("click", () => {
+    const a = parseISO(inEl.value), b = parseISO(outEl.value);
+    const msg = !a || !b ? "Choose both your check-in and check-out dates."
+      : b <= a ? "Check-out needs to be after check-in."
+      : b < keToday() ? "Those dates have already passed. Check the dates on your booking." : "";
+    if(msg){ document.getElementById("warn").innerHTML = `<div class="warnbox">${msg}</div>`; return; }
+    if(!S.stay || S.stay.in !== a || S.stay.out !== b){ S.meals = []; }
+    S.stay = {in:a, out:b}; save(); go("people");
+  });
+}
+
+// ---------- screen 2: who's eating ----------
+function people(){
+  const p = S.people;
+  app.innerHTML = `<h1>Who's eating?</h1>
+    <p class="lede">Your stay: ${esc(stayText())}. Everyone shares the same meal at each sitting.</p>
+    ${counterHTML("adults","Adults","",p.adults,1)}
+    ${counterHTML("kids","Children 4 to 10","Half price",p.kids,0)}
+    ${counterHTML("tots","Children under 4","Eat free",p.tots,0)}
+    <label class="toggle"><input type="checkbox" id="vegTog" ${p.veg?"checked":""}> Someone doesn't eat meat (they get a vegetarian plate at each meal, included)</label>
+    <div class="stack"><button type="button" class="btn primary" id="next">Continue</button></div>`;
+  const upd = () => { ["adults","kids","tots"].forEach(k => document.getElementById(k+"Out").textContent = p[k]);
+    app.querySelector('[data-c="adults"][data-d="-1"]').disabled = p.adults <= 1;
+    app.querySelector('[data-c="kids"][data-d="-1"]').disabled = p.kids <= 0;
+    app.querySelector('[data-c="tots"][data-d="-1"]').disabled = p.tots <= 0; save(); };
+  app.querySelectorAll("[data-c]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.c; p[k] = Math.max(k === "adults" ? 1 : 0, p[k] + Number(b.dataset.d)); upd(); }));
+  document.getElementById("vegTog").addEventListener("change", e => { p.veg = e.target.checked; save(); });
+  document.getElementById("next").addEventListener("click", () => {
+    if(heads() < 4) S.meals.forEach(x => { if(x.sig){ x.sig = null; } });
+    save(); go("plan");
+  });
+}
+
+// ---------- screen 3: plan ----------
+function plan(){
+  const nights = Math.round((S.stay.out - S.stay.in)/86400e3);
+  const hasLunch = sequence("FB").some(x => x.meal === "L");
+  const opts = ["meal","HB"].concat(hasLunch ? ["FB"] : []);
+  const perMeal = planTotal("meal");
+  app.innerHTML = `<h1>How would you like to eat?</h1>
+    <p class="lede">${nights} night${nights>1?"s":""}, ${esc(whoText())}.</p>
+    <div class="grid one">${opts.map(o => {
+      let price;
+      if(o === "meal") price = "Breakfast KSh 600 · Lunch or dinner KSh 900 per person";
+      else { const t = planTotal(o), full = sequence(o).reduce((a,x)=>a+PRICE[x.meal]*pe(),0);
+        price = `${ksh(t)} for your group, every meal included (save ${ksh(full - t)})`; }
+      return tile({id:o, name:PLANS[o].name, desc:PLANS[o].desc, price, sel:S.plan===o}); }).join("")}</div>
+    <p class="note">Packages run from dinner on your arrival night to breakfast on your departure morning. ${opts.includes("FB") ? "Full Board has no lunch on arrival or departure day, so those days are charged at the Half Board rate." : ""}</p>
+    ${perMeal ? "" : ""}`;
+  app.querySelectorAll(".tile").forEach(b => b.addEventListener("click", () => {
+    const was = S.plan; S.plan = b.dataset.id; syncMeals();
+    if(S.plan === "meal"){ if(was !== "meal") S.meals.forEach(x => { x.skip = true; }); save(); go("pick"); return; }
+    S.meals.forEach(x => { x.skip = false; }); save();
+    if(!S.meals.length){ go("review"); return; }
+    const first = S.meals.findIndex(x => !done(x));
+    go("meal", first >= 0 ? first : 0);
+  }));
+}
+
+// ---------- screen 3b: pay-per-meal guests tick the meals they want ----------
+function pick(){
+  const days = [];
+  S.meals.forEach((x,i) => { let d = days.find(g => g.day === x.day); if(!d){ d = {day:x.day, items:[]}; days.push(d); } d.items.push(i); });
+  const count = () => S.meals.filter(x => !x.skip).length;
+  const has = m => S.meals.some(x => x.meal === m);
+  app.innerHTML = `<h1>Which meals would you like?</h1>
+    <p class="lede">Tick only the meals you want us to cook. You'll choose the food next.</p>
+    <div class="chips" style="margin-bottom:6px">
+      ${has("D") ? `<button type="button" class="chip" data-all="D">All dinners</button>` : ""}
+      ${has("B") ? `<button type="button" class="chip" data-all="B">All breakfasts</button>` : ""}
+      ${has("L") ? `<button type="button" class="chip" data-all="L">All lunches</button>` : ""}
+      <button type="button" class="chip" data-all="none">Clear</button>
+    </div>
+    ${days.map(g => `<div class="sub">${esc(longDate(g.day))}${g.day === S.stay.in ? " &middot; arrival" : g.day === S.stay.out ? " &middot; departure" : ""}</div>
+      <div class="chips">${g.items.map(i => { const x = S.meals[i];
+        return `<button type="button" class="chip${x.skip ? "" : " sel"}" data-want="${i}">${MEAL_NAME[x.meal]}<small>${ksh(PRICE[x.meal]*pe())}</small></button>`; }).join("")}</div>`).join("")}
+    <div id="warn"></div>
+    <div class="stack"><button type="button" class="btn primary" id="next">Choose my food &rsaquo; <span id="cnt"></span></button></div>`;
+  const upd = () => {
+    app.querySelectorAll("[data-want]").forEach(b => b.classList.toggle("sel", !S.meals[+b.dataset.want].skip));
+    const c = count(); document.getElementById("cnt").textContent = c ? `(${c} meal${c>1?"s":""})` : ""; save();
+  };
+  app.querySelectorAll("[data-want]").forEach(b => b.addEventListener("click", () => { const x = S.meals[+b.dataset.want]; x.skip = !x.skip; upd(); }));
+  app.querySelectorAll("[data-all]").forEach(b => b.addEventListener("click", () => {
+    const m = b.dataset.all;
+    if(m === "none") S.meals.forEach(x => { x.skip = true; });
+    else { const all = S.meals.filter(x => x.meal === m).every(x => !x.skip); S.meals.forEach(x => { if(x.meal === m) x.skip = all; }); }
+    upd();
+  }));
+  document.getElementById("next").addEventListener("click", () => {
+    const act = active();
+    if(!act.length){ document.getElementById("warn").innerHTML = `<div class="warnbox">Tick at least one meal.</div>`; return; }
+    const first = act.find(i => !done(S.meals[i]));
+    go("meal", first !== undefined ? first : act[0]);
+  });
+  upd();
+}
+
+// ---------- screen 4: one meal at a time ----------
+function mealScreen(){
+  const x = S.meals[step];
+  if(!x){ go("review"); return; }
+  const pkg = isPkg(), act = active(), pos = act.indexOf(step), n = act.length;
+  const isLast = pos >= n - 1;
+  const ctx = mealContext(x);
+  const prev = act.slice(0, Math.max(pos,0)).reverse().map(i => S.meals[i]).find(y => y.meal === x.meal && !y.skip && !y.sig && (y.chef || y.plate || (y.base && y.protein)));
+  const undoneAhead = act.slice(pos).filter(i => !done(S.meals[i])).length;
+  const showSig = x.meal === "D" && heads() >= 4;
+  let body = "";
+  if(x.meal === "B"){
+    body = `<div class="grid">${BREAKFAST.map(b => tile({...b, sel:x.plate===b.id && !x.chef && !x.skip})).join("")}
+      ${tile({id:"__chef", name:"Chef's choice", desc:"Let Zipporah decide", sel:x.chef})}</div>
+      <p class="note">Served with tea, coffee or hot chocolate.</p>`;
+  } else {
+    body = `${x.meal === "L" ? `<label class="toggle" style="margin-bottom:12px"><input type="checkbox" id="packTog" ${x.packed?"checked":""}> Pack it to go (for Hell's Gate, Crescent Island or the lake)</label>` : ""}
+      <div class="sub">1. Choose a base</div>
+      <div class="chips">${BASES.map(b => chip("data-base", b.id, b.name + (b.desc ? ` (${b.id === "chips" ? b.desc : b.desc.toLowerCase()})` : ""), x.base===b.id && !x.sig && !x.chef)).join("")}</div>
+      <div class="sub">2. Choose a protein</div>
+      <div class="chips">${MEAT.map(p => chip("data-prot", p.id, p.name, x.protein===p.id && !x.sig && !x.chef)).join("")}
+        ${VEG.map(p => chip("data-prot", p.id, p.name, x.protein===p.id && !x.sig && !x.chef, true)).join("")}</div>
+      <p class="note">Served with vegetables of the day: sukuma (collard greens), cabbage or kachumbari (tomato &amp; onion salad).</p>
+      <div class="grid one" style="margin-top:12px">${tile({id:"__chef", name:"Chef's choice", desc:"Let Zipporah decide this meal", sel:x.chef})}</div>
+      ${x.meal === "D" ? `<div class="sub">Or make it a Signature Night</div>
+        ${showSig ? `<div class="grid one">${SIGNATURE.map(s => { const c = sigCost({...x, sig:s.id});
+          return tile({id:"sig:"+s.id, name:s.name, desc:s.desc, v:s.v, sel:x.sig===s.id,
+            price:(pkg ? "+" : "") + ksh(c) + " for your group"}); }).join("")}</div>
+          <p class="note">${pkg ? "Package upgrade: Fish Feast +KSh 600 per person, Nyama Choma +KSh 900 (minimum KSh 11,000 for the night)." : "Nyama Choma has a minimum charge of KSh 11,000."} Children 4 to 10 half price, under 4 free. Best ordered 3 days ahead.</p>
+          ${x.sig ? `<div class="sub" id="sidesHead">Choose 2 sides for your ${esc(find(SIGNATURE,x.sig).name)}</div>
+            <div class="chips">${find(SIGNATURE,x.sig).sides.map(id => chip("data-side", id, find(BASES,id).name, (x.sides||[]).includes(id))).join("")}</div>` : ""}`
+        : `<p class="note">Signature Nights are for groups of 4 or more.</p>`}` : ""}`;
+  }
+  app.innerHTML = `
+    <div class="mealhead"><span class="when">${esc(longDate(x.day))}${ctx ? " &middot; " + esc(ctx) : ""}</span>
+      <h1>${esc(MEAL_NAME[x.meal])}</h1>
+      <span class="cost"></span></div>
+    ${body}
+    <div id="sn"></div>
+    ${prev && !done(x) ? `<div class="stack"><button type="button" class="btn ghost" id="same">Same as ${esc(longDate(prev.day))}: ${esc(choiceText(prev))}</button></div>` : ""}
+    <div class="stack">
+      <button type="button" class="btn primary" id="next">${isLast ? "Review my order" : "Next meal"} &rsaquo;</button>
+      ${undoneAhead > 1 ? `<button type="button" class="btn ghost" id="chefRest">Let Zipporah choose the other ${undoneAhead} meals</button>` : ""}
+      ${pkg ? "" : `<button type="button" class="btn ghost" id="skip">Remove this meal</button>`}
+    </div>`;
+
+  const refresh = () => {
+    document.querySelector(".mealhead .cost").textContent = x.skip ? "Skipped"
+      : pkg ? (x.sig ? `Upgrade: +${ksh(sigCost(x))} for your group` : "Included in your package")
+      : (x.sig ? ksh(mealCost(x)) : ksh(PRICE[x.meal]*pe())) + " for your group";
+    document.getElementById("sn").innerHTML = !x.skip && done(x) && shortNotice(x)
+      ? `<div class="warnbox">That's short notice. You can still order; Zipporah will confirm whether she can make it.</div>` : "";
+    drawBar(); save();
+  };
+  const advance = () => { const nx = act[pos+1]; if(nx !== undefined) go("meal", nx); else go("review"); };
+  app.querySelectorAll(".tile").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.id; x.skip = false;
+    if(id === "__chef"){ x.chef = true; x.sig = null; x.plate = x.base = x.protein = null; save(); advance(); return; }
+    if(id.startsWith("sig:")){ x.sig = id.slice(4); x.chef = false; x.base = x.protein = null;
+      const allowed = find(SIGNATURE, x.sig).sides; x.sides = (x.sides||[]).filter(v => allowed.includes(v));
+      save(); render(); const h = document.getElementById("sidesHead"); if(h) h.scrollIntoView({block:"center"}); return; }
+    x.plate = id; x.chef = false; save(); advance();
+  }));
+  app.querySelectorAll("[data-base]").forEach(b => b.addEventListener("click", () => {
+    x.base = b.dataset.base; x.chef = false; x.sig = null; x.skip = false;
+    app.querySelectorAll("[data-base]").forEach(c => c.classList.toggle("sel", c === b));
+    app.querySelectorAll(".tile").forEach(c => c.classList.remove("sel")); refresh();
+  }));
+  app.querySelectorAll("[data-prot]").forEach(b => b.addEventListener("click", () => {
+    x.protein = b.dataset.prot; x.chef = false; x.sig = null; x.skip = false;
+    app.querySelectorAll("[data-prot]").forEach(c => c.classList.toggle("sel", c === b));
+    app.querySelectorAll(".tile").forEach(c => c.classList.remove("sel")); refresh();
+  }));
+  app.querySelectorAll("[data-side]").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.side; x.sides = x.sides || [];
+    if(x.sides.includes(id)) x.sides = x.sides.filter(v => v !== id);
+    else { x.sides.push(id); if(x.sides.length > 2) x.sides.shift(); }
+    app.querySelectorAll("[data-side]").forEach(c => c.classList.toggle("sel", x.sides.includes(c.dataset.side))); refresh();
+  }));
+  const pt = document.getElementById("packTog");
+  if(pt) pt.addEventListener("change", () => { x.packed = pt.checked; save(); });
+  const sm = document.getElementById("same");
+  if(sm) sm.addEventListener("click", () => { ["plate","base","protein","chef","packed"].forEach(k => { x[k] = prev[k]; }); x.sig = null; x.skip = false; save(); advance(); });
+  const cr = document.getElementById("chefRest");
+  if(cr) cr.addEventListener("click", () => { act.slice(pos).forEach(i => { const y = S.meals[i]; if(!done(y)){ y.chef = true; y.sig = null; } }); save(); go("review"); });
+  const sk = document.getElementById("skip");
+  if(sk) sk.addEventListener("click", () => { x.skip = true; x.chef = false; x.sig = null; save(); advance(); });
+  document.getElementById("next").addEventListener("click", () => {
+    if(!done(x)){
+      document.getElementById("sn").innerHTML = `<div class="warnbox">${x.sig ? "Choose 2 sides for your Signature Night" : (x.meal === "B" ? "Tap a plate" : "Choose a base and a protein") + ", tap Chef's choice" + (pkg ? "" : ", or remove this meal")}.</div>`;
+      return;
+    }
+    advance();
+  });
+  refresh();
+}
+
+// ---------- review ----------
+function messageBody(){
+  const p = [];
+  if(S.name.trim()) p.push(`Guest: ${S.name.trim()}`);
+  p.push(`Stay: ${stayText()}`);
+  p.push(`Plan: ${PLANS[S.plan].name}`);
+  p.push(`Group: ${whoText()}`);
+  if(S.people.veg) p.push("1 guest doesn't eat meat: vegetarian plate at each meal");
+  p.push("");
+  S.meals.filter(x => !x.skip).forEach(x => {
+    p.push(`${longDate(x.day)} ${mealTitle(x).toLowerCase()}: ${choiceText(x)}${isPkg() ? (x.sig ? ` (+${ksh(sigCost(x))})` : "") : ` (${ksh(mealCost(x))})`}${shortNotice(x) ? ", short notice, please confirm" : ""}`);
+  });
+  p.push("");
+  if(S.notes.trim()) p.push(`Allergies or requests: ${S.notes.trim()}`);
+  p.push(`Estimated total: ${ksh(total())}`);
+  p.push("Please confirm the total and we'll pay through Airbnb or M-Pesa to Zipporah.");
+  return p.join("\n");
+}
+function message(){
+  const body = messageBody();
+  const updated = S.lastBody && S.lastBody !== body;
+  const head = updated ? `UPDATED Lakeview Haven meal order (replaces the order sent ${S.lastAt})` : "Lakeview Haven meal order";
+  return `${head}\nSent: ${keNow()}\n${body}`;
+}
+function review(){
+  const act = active();
+  const ordered = act.map(i => S.meals[i]);
+  const missing = act.find(i => !done(S.meals[i])) ?? -1;
+  const msg = message();
+  const href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  app.innerHTML = `<h1>Your meal plan</h1>
+    <p class="lede">${esc(stayText())} &middot; ${esc(whoText())} &middot; ${esc(PLANS[S.plan].name)}</p>
+    ${missing >= 0 ? `<div class="warnbox">Some meals aren't chosen yet. <a href="#" id="finish">Finish choosing</a></div>` : ""}
+    ${act.map(i => [S.meals[i], i]).map(([x,i]) => `<div class="card mealrow">
+      <div class="sumline"><div><div class="meta">${esc(longDate(x.day))} &middot; ${esc(mealTitle(x))}</div>
+        <h3>${esc(choiceText(x))}</h3></div>
+        <span class="amt">${x.skip ? "" : isPkg() ? (x.sig ? "+" + ksh(sigCost(x)) : "Included") : ksh(mealCost(x))}</span></div>
+      <button type="button" class="rm" data-edit="${i}">Change</button></div>`).join("")}
+    ${S.plan === "meal" ? `<div class="stack"><button type="button" class="btn ghost" id="addRemove">Add or remove meals</button></div>` : ""}
+    ${S.people.veg ? `<p class="note">A vegetarian plate is included at each meal for the guest who doesn't eat meat.</p>` : ""}
+    <div class="total"><span>Estimated total</span><b>${ksh(total())}</b></div>
+    <p class="note">Your order is confirmed once paid, through Airbnb or by M-Pesa to Zipporah (+254 795 808391). Changes are free until the ordering deadline: 24 hours before each meal, or 3 days for Signature Nights. After that, the meal is charged because Zipporah will have shopped for it.</p>
+    <div class="field"><label for="notes">Allergies or special requests (optional)</label>
+      <input id="notes" placeholder="For example: one child allergic to nuts" value="${esc(S.notes)}"></div>
+    <div class="field"><label for="guestName">Your name</label>
+      <input id="guestName" autocomplete="name" placeholder="As on your Airbnb booking" value="${esc(S.name)}"></div>
+    <div class="stack"><button type="button" class="btn primary" id="copyBtn" ${ordered.length && missing < 0 ? "" : "disabled"}>Copy order for Airbnb</button></div>
+    <div class="card" id="airSteps" hidden>
+      <h3>Order copied. Now:</h3>
+      <div class="meta">1. Open your Airbnb messages.</div>
+      <div class="meta">2. Open your chat with Lakeview Haven.</div>
+      <div class="meta">3. Paste and send. Zipporah will confirm your total; pay through Airbnb or by M-Pesa to her number.</div>
+      <div class="stack" style="margin-top:12px"><a class="btn lake" href="https://www.airbnb.com/guest/messages" target="_blank" rel="noopener">Open Airbnb messages</a></div>
+    </div>
+    <p class="note">Prefer WhatsApp? <a id="sendBtn" href="${href}" target="_blank" rel="noopener">Send it to Zipporah on WhatsApp instead</a> (+254 795 808391).</p>
+    <div class="stack">
+      <button type="button" class="btn ghost" id="chgPlan">Change plan or group</button>
+      <button type="button" class="btn ghost" id="chgStay">Change stay dates</button>
+    </div>
+    <details><summary>See the message</summary><pre class="preview" id="preview">${esc(msg)}</pre></details>`;
+  const f = document.getElementById("finish");
+  if(f) f.addEventListener("click", e => { e.preventDefault(); go("meal", missing); });
+  app.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => go("meal", Number(b.dataset.edit))));
+  const ar = document.getElementById("addRemove"); if(ar) ar.addEventListener("click", () => go("pick"));
+  document.getElementById("sendBtn").addEventListener("click", () => { S.lastBody = messageBody(); S.lastAt = keNow(); save(); });
+  const notesEl = document.getElementById("notes");
+  notesEl.addEventListener("input", () => { S.notes = notesEl.value; save();
+    const m = message(); document.getElementById("sendBtn").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(m)}`;
+    document.getElementById("preview").textContent = m; });
+  document.getElementById("chgPlan").addEventListener("click", () => go("people"));
+  document.getElementById("chgStay").addEventListener("click", () => go("stay"));
+  const nameEl = document.getElementById("guestName");
+  nameEl.addEventListener("input", () => { S.name = nameEl.value; save();
+    const m = message(); document.getElementById("sendBtn").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(m)}`;
+    document.getElementById("preview").textContent = m; });
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    const btn = document.getElementById("copyBtn"), steps = document.getElementById("airSteps"), text = message();
+    const ok = () => { btn.textContent = "Copied. Copy again"; steps.hidden = false; S.lastBody = messageBody(); S.lastAt = keNow(); save(); };
+    const fallback = () => { const d = app.querySelector("details"); d.open = true;
+      const r = document.createRange(); r.selectNodeContents(document.getElementById("preview"));
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      let copied = false; try{ copied = document.execCommand("copy"); }catch(e){}
+      if(copied) ok(); else { btn.textContent = "Order selected below. Copy it, then paste in Airbnb"; steps.hidden = false; S.lastBody = messageBody(); S.lastAt = keNow(); save(); } };
+    try{ navigator.clipboard.writeText(text).then(ok).catch(fallback); }catch(e){ fallback(); }
+  });
+}
+
+// ---------- chrome ----------
+function drawProgress(){
+  if(screen !== "meal"){ progress.innerHTML = ""; return; }
+  const act = active(), n = act.length, pos = Math.max(0, act.indexOf(step)), pct = Math.round(((pos+1)/n)*100);
+  progress.innerHTML = `<div class="ptext">Meal ${pos+1} of ${n}</div><div class="ptrack"><span style="width:${pct}%"></span></div>`;
+}
+function drawBar(){
+  const show = (screen === "meal") && S.plan;
+  bar.hidden = !show;
+  if(show) barText.innerHTML = `Running total<b>${ksh(total())}</b>`;
+}
+const SCREENS = {stay:stayScreen, people, plan, pick, meal:mealScreen, review};
+function render(){
+  if(screen !== "stay" && !stayValid()){ screen = "stay"; history = []; }
+  if((screen === "meal" || screen === "review") && !S.plan){ screen = "plan"; }
+  backBtn.hidden = history.length === 0;
+  (SCREENS[screen] || stayScreen)();
+  drawProgress(); drawBar();
+}
+// returning guests pick up where they left off
+if(stayValid() && S.plan && S.meals.length){ syncMeals(); screen = "review"; }
+render();
+})();
+</script>
+
+</body>
+</html>
