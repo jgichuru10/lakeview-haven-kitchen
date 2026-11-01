@@ -203,7 +203,7 @@ const barBtn = document.getElementById("barBtn");
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function save(){ try{ localStorage.setItem("lh_state", JSON.stringify(S)); }catch(e){} }
 let S = load("lh_state", null) || {stay:null, people:{adults:2, kids:0, tots:0, veg:false}, plan:null, meals:[], name:""};
-S.notes = S.notes || "";
+S.notes = S.notes || ""; S.pay = S.pay || "";
 let screen = "stay", step = 0, history = [];
 
 const ksh = n => "KSh " + Math.round(n).toLocaleString("en-US");
@@ -531,7 +531,9 @@ function messageBody(){
   p.push("");
   if(S.notes.trim()) p.push(`Allergies or requests: ${S.notes.trim()}`);
   p.push(`Estimated total: ${ksh(total())}`);
-  p.push("Please confirm the total and we'll pay through Airbnb or M-Pesa to Zipporah.");
+  p.push(S.pay === "airbnb" ? "Please confirm the total and send me an Airbnb payment request."
+    : S.pay === "mpesa" ? "Please confirm the total. I'll pay by M-Pesa to Zipporah (0795 808391) once confirmed."
+    : "Please confirm the total and let me know how to pay.");
   return p.join("\n");
 }
 function message(){
@@ -558,6 +560,8 @@ function review(){
     ${S.people.veg ? `<p class="note">A vegetarian plate is included at each meal for the guest who doesn't eat meat.</p>` : ""}
     <div class="total"><span>Estimated total</span><b>${ksh(total())}</b></div>
     <p class="note">Your order is confirmed once paid, through Airbnb or by M-Pesa to Zipporah (+254 795 808391). Changes are free until the ordering deadline: 24 hours before each meal, or 3 days for Signature Nights. After that, the meal is charged because Zipporah will have shopped for it.</p>
+    <div class="sub">How will you pay?</div>
+    <div class="chips" id="payChips">${chip("data-pay","airbnb","Through Airbnb", S.pay==="airbnb")}${chip("data-pay","mpesa","M-Pesa to Zipporah", S.pay==="mpesa")}</div>
     <div class="field"><label for="notes">Allergies or special requests (optional)</label>
       <input id="notes" placeholder="For example: one child allergic to nuts" value="${esc(S.notes)}"></div>
     <div class="field"><label for="guestName">Your name</label>
@@ -581,6 +585,11 @@ function review(){
   app.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => go("meal", Number(b.dataset.edit))));
   const ar = document.getElementById("addRemove"); if(ar) ar.addEventListener("click", () => go("pick"));
   document.getElementById("sendBtn").addEventListener("click", () => { S.lastBody = messageBody(); S.lastAt = keNow(); save(); });
+  app.querySelectorAll("[data-pay]").forEach(b => b.addEventListener("click", () => {
+    S.pay = b.dataset.pay; save();
+    app.querySelectorAll("[data-pay]").forEach(c => c.classList.toggle("sel", c === b));
+    const m = message(); document.getElementById("sendBtn").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(m)}`;
+    document.getElementById("preview").textContent = m; }));
   const notesEl = document.getElementById("notes");
   notesEl.addEventListener("input", () => { S.notes = notesEl.value; save();
     const m = message(); document.getElementById("sendBtn").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(m)}`;
