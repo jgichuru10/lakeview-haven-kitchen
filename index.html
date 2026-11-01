@@ -105,8 +105,13 @@ h1{font-family:var(--display);font-size:28px;line-height:1.15;margin:6px 0 4px;t
 .total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 4px;border-top:2px solid var(--line);margin-top:6px}
 .total b{font-family:var(--display);font-size:24px;color:var(--ink);font-variant-numeric:tabular-nums}
 .pp{background:var(--lake-soft);border-radius:12px;padding:10px 12px;margin:2px 0 6px;font-size:14px;color:var(--ink)}
-.pp b{font-family:var(--display);font-size:18px;color:var(--lake);font-variant-numeric:tabular-nums}
+.pp b{font-family:var(--display);font-size:17px;color:var(--lake);font-variant-numeric:tabular-nums;line-height:1.4}
 .pp small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.pph{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ppi{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0;border-bottom:1px solid var(--line)}
+.ppi:last-of-type{border-bottom:none}
+.ppi em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+.ppi b{font-family:var(--body);font-size:15px;font-weight:700;color:var(--lake);line-height:1.3;white-space:nowrap}
 .field{display:grid;gap:6px;margin-top:14px}
 .field label{font-weight:600}
 .field input{font:16px var(--body);padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
@@ -520,19 +525,34 @@ function mealScreen(){
 }
 
 // ---------- per-person reference under the total ----------
-// Average cost for one adult per meal: total / (adult-equivalents x meals ordered).
-// Children 4 to 10 count as half an adult, under 4 as zero, matching how prices are charged.
+// Packages: lead with the cost per adult per day (how hotels quote), then the package meal rates.
+// Pay per meal: show the per-adult price of each meal type ordered.
+// Children 4 to 10 count as half an adult and under 4 as free, matching how prices are charged.
 function perPersonHTML(){
-  const meals = S.meals.filter(x => !x.skip && done(x)).length;
+  const ordered = S.meals.filter(x => !x.skip && done(x));
   const t = total(), p = pe();
-  if(!meals || !t || !p) return "";
-  const perMeal = t / p / meals;
-  const nights = Math.max(1, Math.round((S.stay.out - S.stay.in)/86400e3));
-  const perDay = t / p / nights;
+  if(!ordered.length || !t || !p) return "";
+  const has = m => ordered.some(x => x.meal === m && !x.sig);
+  const sigs = [...new Set(ordered.filter(x => x.sig).map(x => x.sig))].map(id => find(SIGNATURE, id));
   const kidsNote = S.people.kids || S.people.tots
-    ? `Children 4 to 10 pay half of this${S.people.tots ? ", and under 4 eat free" : ""}.` : "";
-  return `<div class="pp">That's about <b>${ksh(Math.round(perMeal/10)*10)}</b> per adult, per meal
-    <small>${meals} meal${meals>1?"s":""} for ${esc(whoText())}, about ${ksh(Math.round(perDay/10)*10)} per adult a day. ${kidsNote}</small></div>`;
+    ? ` Children 4 to 10 pay half${S.people.tots ? "; under 4 eat free" : ""}.` : "";
+  if(isPkg()){
+    const nights = Math.max(1, Math.round((S.stay.out - S.stay.in)/86400e3));
+    const perDay = Math.round(t / p / nights / 10) * 10;
+    const rates = [`Breakfast ${ksh(PKG_MEAL.B)}`].concat(S.plan === "FB" ? [`Lunch ${ksh(PKG_MEAL.L)}`] : [], [`Dinner ${ksh(PKG_MEAL.D)}`]);
+    const up = sigs.length ? ` Includes your Signature Night upgrade${sigs.length > 1 ? "s" : ""}.` : "";
+    return `<div class="pp">That's about <b>${ksh(perDay)}</b> per adult a day
+      <small>${rates.join(" &middot; ")} per adult (package rate).${up}${kidsNote}</small></div>`;
+  }
+  const parts = [];
+  const item = (label, price, note) => `<span class="ppi"><span>${esc(label)}${note ? `<em>${esc(note)}</em>` : ""}</span><b>${ksh(price)}</b></span>`;
+  if(has("B")) parts.push(item("Breakfast", PRICE.B));
+  if(has("L") && has("D")) parts.push(item("Lunch or dinner", PRICE.D));
+  else if(has("L")) parts.push(item("Lunch", PRICE.L));
+  else if(has("D")) parts.push(item("Dinner", PRICE.D));
+  sigs.forEach(sg => parts.push(item(sg.name, sg.price, sg.min ? `minimum ${ksh(sg.min)} a night` : "")));
+  return `<div class="pp"><span class="pph">Price per adult, per meal</span>${parts.join("")}
+    ${kidsNote ? `<small>${kidsNote.trim()}</small>` : ""}</div>`;
 }
 
 // ---------- review ----------
